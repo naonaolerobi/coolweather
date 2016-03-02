@@ -39,6 +39,10 @@ public class ChooseAreaActivty extends Activity {
 	private ArrayAdapter<String> adapter;
 	private CoolWeatherDB coolWeatherDB;
 	private List<String> dataList = new ArrayList<String>();
+	/**
+	 * 判断是否是从WeatherActivity中跳转过来的
+	 */
+	private boolean isFromWeatherActivity;
 
 	/**
 	 * 省列表
@@ -69,10 +73,14 @@ public class ChooseAreaActivty extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		isFromWeatherActivity = getIntent().getBooleanExtra(
+				"form_weather_activity", false);
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		if(prefs.getBoolean("city_selected", false)){
-			Intent intent = new Intent(ChooseAreaActivty.this, WeatherActivity.class);
+		//已经选择了城市而且不是从weatherActivity跳转过来的才会直接跳转到weatherActivity
+		if (prefs.getBoolean("city_selected", false)&&isFromWeatherActivity) {
+			Intent intent = new Intent(ChooseAreaActivty.this,
+					WeatherActivity.class);
 			startActivity(intent);
 			finish();
 			return;
@@ -98,8 +106,9 @@ public class ChooseAreaActivty extends Activity {
 				} else if (currentLevel == LEVEL_CITY) {
 					selectedCity = cityList.get(position);
 					queryCounties();
-				} else if(currentLevel==LEVEL_COUNTY){
-					String countyCode = countyList.get(position).getCounty_code();
+				} else if (currentLevel == LEVEL_COUNTY) {
+					String countyCode = countyList.get(position)
+							.getCounty_code();
 					Intent intent = new Intent(ChooseAreaActivty.this,
 							WeatherActivity.class);
 					intent.putExtra("county_code", countyCode);
@@ -273,7 +282,12 @@ public class ChooseAreaActivty extends Activity {
 		} else if (currentLevel == LEVEL_CITY) {
 			queryProvince();
 		} else {
+			if(isFromWeatherActivity){
+				Intent intent = new Intent(ChooseAreaActivty.this, WeatherActivity.class);
+				startActivity(intent);
+			}
 			finish();
 		}
 	}
+
 }

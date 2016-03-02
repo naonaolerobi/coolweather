@@ -1,11 +1,7 @@
 package com.coolweather.app.activity;
 
-import com.coolweather.app.R;
-import com.coolweather.app.util.HttpCallbackListener;
-import com.coolweather.app.util.HttpUtil;
-import com.coolweather.app.util.Utility;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,6 +11,11 @@ import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.coolweather.app.R;
+import com.coolweather.app.util.HttpCallbackListener;
+import com.coolweather.app.util.HttpUtil;
+import com.coolweather.app.util.Utility;
 
 public class WeatherActivity extends Activity {
 	private LinearLayout weatherInfoLayout;
@@ -149,13 +150,34 @@ public class WeatherActivity extends Activity {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		cityNameText.setText(prefs.getString("city_name", ""));
-		temp1Text.setText(prefs.getString("temp1", ""));
-		temp2Text.setText(prefs.getString("temp2", ""));
+		temp1Text.setText(prefs.getString("temp2", ""));
+		temp2Text.setText(prefs.getString("temp1", ""));
 		weatherDespText.setText(prefs.getString("weather_desp", ""));
-		publishText.setText(prefs.getString("publish_time", ""));
+		publishText.setText("今天"+prefs.getString("publish_time", "")+"发布");
 		currentDateText.setText(prefs.getString("current_date", ""));
 		weatherInfoLayout.setVisibility(View.VISIBLE);
 		cityNameText.setVisibility(View.VISIBLE);
 	}
+	/**
+	 * button事件监听
+	 */
+	public void switchCity(View view){
+		Intent intent = new Intent(WeatherActivity.this, ChooseAreaActivty.class);
+		intent.putExtra("from_weather_activity", true);
+		startActivity(intent);
+		finish();
+	}
+	public void refreshWeather(View view){
+		publishText.setText("同步中...");
+		Log.d(TAG, "更新中");
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String weatherCode = prefs.getString("weather_code", "");
+		if(!TextUtils.isEmpty(weatherCode)){
+			queryWeatherInfo(weatherCode);
+		}
+		Log.d(TAG, "更新完毕");
+	}
+	
 
+	
 }
